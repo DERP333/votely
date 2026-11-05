@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "Votely - Real-Time Polling Platform",
   "scripts": {
-    "start": "cd votely-app && npm run dev",
+    "start": "node votely-app/server/server.js",
+    "build": "cd votely-app && npm run build",
     "dev": "cd votely-app && npm run dev",
     "install:all": "cd votely-app && npm run install:all"
   }
 }
-

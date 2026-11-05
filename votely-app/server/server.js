@@ -1,6 +1,8 @@
 const http = require('http');
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
+const fs = require('fs');
 const { Server } = require('socket.io');
 require('dotenv').config();
 
@@ -10,7 +12,7 @@ const pollRoutes = require('./routes/pollRoutes');
 const app = express();
 const server = http.createServer(app);
 
-// Initialize Socket.io with permissive CORS for development
+// Initialize Socket.io with permissive CORS for development & deployment
 const io = new Server(server, {
   cors: {
     origin: '*',
@@ -25,7 +27,7 @@ app.set('io', io);
 app.use(cors());
 app.use(express.json());
 
-// Routes
+// API Routes
 app.use('/api/users', userRoutes);
 app.use('/api/polls', pollRoutes);
 
@@ -37,6 +39,17 @@ app.get('/api/health', (req, res) => {
     timestamp: new Date().toISOString()
   });
 });
+
+// Serve frontend in production (static build)
+const clientDistPath = path.join(__dirname, '../client/dist');
+if (fs.existsSync(clientDistPath)) {
+  app.use(express.static(clientDistPath));
+  app.get('*', (req, res) => {
+    if (!req.path.startsWith('/api')) {
+      res.sendFile(path.join(clientDistPath, 'index.html'));
+    }
+  });
+}
 
 // Socket.io Real-Time connection management
 io.on('connection', (socket) => {
@@ -63,4 +76,3 @@ server.listen(PORT, () => {
   console.log(`🚀 Votely Server running on http://localhost:${PORT}`);
   console.log(`⚡ WebSocket server active for real-time live polling`);
 });
-

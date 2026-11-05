@@ -28,7 +28,8 @@ const npmCmd = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 const clientProcess = spawn(npmCmd, ['run', 'dev'], {
   cwd: clientDir,
   stdio: 'pipe',
-  env: process.env
+  env: process.env,
+  shell: true
 });
 
 clientProcess.stdout.on('data', (data) => {
@@ -48,4 +49,3 @@ const cleanup = () => {
 
 process.on('SIGINT', cleanup);
 process.on('SIGTERM', cleanup);
-
